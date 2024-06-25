@@ -1,0 +1,65 @@
+
+USE PruebaTecnicaNetForemost;
+GO
+
+CREATE PROCEDURE Asignar_Saldos_a_Gestores
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+	IF OBJECT_ID('tempdb..#Saldos_Ordenados') IS NOT NULL DROP TABLE #Saldos_Ordenados 
+
+    DECLARE @id_saldo INT;
+    DECLARE @id_gestor INT;
+    DECLARE @i INT = 1;
+    DECLARE @total INT;
+
+    SELECT @total = COUNT(1) FROM Saldo;
+
+    SELECT ROW_NUMBER() OVER (ORDER BY monto DESC) AS fila, id_saldo, monto
+    INTO #Saldos_Ordenados
+    FROM Saldo;
+
+    DECLARE Gestor_Cursor CURSOR FOR
+    SELECT id_gestor FROM Gestor WHERE activo = 1;
+
+	DELETE FROM Gestor_Saldo;--limpiar antes de asignar
+
+    OPEN Gestor_Cursor;
+
+    FETCH NEXT FROM Gestor_Cursor INTO @id_gestor;
+
+    WHILE @@FETCH_STATUS = 0 AND @i <= @total
+    BEGIN
+	SELECT @id_saldo = id_saldo FROM #Saldos_Ordenados WHERE fila = @i;
+
+            INSERT INTO Gestor_Saldo (id_gestor, id_saldo)
+            VALUES (@id_gestor, @id_saldo);
+
+            SET @i = @i + 1;
+
+            FETCH NEXT FROM Gestor_Cursor INTO @id_gestor;
+
+		IF @@FETCH_STATUS <> 0
+        BEGIN
+            CLOSE Gestor_Cursor;
+            OPEN Gestor_Cursor;
+            FETCH NEXT FROM Gestor_Cursor INTO @id_gestor;
+        END
+        
+    END
+
+    CLOSE Gestor_Cursor;
+    DEALLOCATE Gestor_Cursor;
+
+	IF OBJECT_ID('tempdb..#Saldos_Ordenados') IS NOT NULL DROP TABLE #Saldos_Ordenados 
+END;
+
+
+
+
+SELECT GestorID, COUNT(*) AS NumSaldos, SUM(Saldos.Monto) AS TotalMonto
+FROM Asignaciones
+JOIN Saldos ON Asignaciones.SaldoID = Saldos.SaldoID
+GROUP BY GestorID
+ORDER BY GestorID;

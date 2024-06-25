@@ -1,0 +1,42 @@
+﻿@using Prueba_Tecnica_NetForemost.Models;
+@model List<AsignacionSaldosGestores>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Asignaciones de Saldos a Gestores</h2>
+<br />
+<form method="post" asp-action="Ejecutar">
+    <div class="row">
+        <div class="col-md-12" style="text-align:right">
+            <button type="submit" class="btn btn-primary" onclick="$.blockUI({ message: '<h1>Procesando...</h1>' });">Ejecutar Procedimiento Almacenado</button>
+        </div>
+        
+    </div>
+</form>
+<br />
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>GestorID</th>
+                <th>Gestor Nombre</th>
+                <th>Numero de saldos</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var asignacion in Model)
+            {
+                <tr>
+                    <td>@asignacion.GestorID</td>
+                    <td>@asignacion.GestorNombre</td>
+                    <td>@asignacion.NumSaldos</td>
+                    <td>@asignacion.Monto.ToString("n2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

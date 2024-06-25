@@ -1,0 +1,52 @@
+IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = 'PruebaTecnicaNetForemost')
+BEGIN
+  CREATE DATABASE PruebaTecnicaNetForemost;
+END
+GO
+
+USE PruebaTecnicaNetForemost;
+
+
+
+create table Gestor(
+id_gestor INT IDENTITY(1,1) NOT NULL,
+nombre NVARCHAR(50) NOT NULL,
+apellido NVARCHAR(100) NULL,
+activo bit DEFAULT 1 NOT NULL,
+
+CONSTRAINT PK_Gestor PRIMARY KEY (id_gestor)
+)
+GO
+
+create table Saldo(
+id_saldo INT IDENTITY(1,1) NOT NULL,
+monto decimal(18,2) NOT NULL,
+
+CONSTRAINT PK_Saldo PRIMARY KEY (id_saldo)
+)
+GO
+
+create table Gestor_Saldo(
+id_gestor_saldo INT IDENTITY(1,1),
+id_gestor INT NOT NULL,
+id_saldo INT NOT NULL,
+
+CONSTRAINT PK_Gestor_Saldo PRIMARY KEY (id_gestor_saldo),
+FOREIGN KEY (id_gestor) REFERENCES Gestor(id_gestor),
+FOREIGN KEY (id_saldo) REFERENCES Saldo(id_saldo)
+
+)
+GO
+
+INSERT INTO Gestor (nombre, apellido) VALUES 
+('Jose','Mena'), ('Jerry', 'Aguilar'), ('David', 'Lazo'), ('Freddy', 'Rivas'), ('Antonio', 'Cruz'), 
+('Lester', 'Aleman'), ('Jose','Guerra'), ('Erling',null), ('Cleo','Nuñez'), ('Martin','Parrales');
+GO
+
+INSERT INTO Saldo (Monto) VALUES 
+(2277), (3953), (4726), (1414), (627), (1784), (1634), (3958), (2156), (1347), 
+(2166), (820), (2325), (3613), (2389), (4130), (2007), (3027), (2591), (3940), 
+(3888), (2975), (4470), (2291), (3393), (3588), (3286), (2293), (4353), (3315), 
+(4900), (794), (4424), (4505), (2643), (2217), (4193), (2893), (4120), (3352), 
+(2355), (3219), (3064), (4893), (272), (1299), (4725), (1900), (4927), (4011);
+GO
